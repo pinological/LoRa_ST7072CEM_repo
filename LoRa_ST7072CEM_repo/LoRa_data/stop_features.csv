@@ -1,0 +1,62 @@
+stop_key,site,distance_to_station_m,station_ant_m,roamer_ant_m,stop_elev_m_srtm30,station_elev_m_srtm30,elev_diff_m,elev_angle_deg,terrain_category,land_cover,line_of_sight
+A13,A,236.0,2.0,1.3,1397,1372,25,5.88,mountain,forest,blocked
+A14,A,202.0,2.0,1.3,1403,1372,31,8.53,mountain,mixed,partly blocked
+A15,A,201.0,2.0,1.3,1403,1372,31,8.57,mountain,mixed,clear
+A16,A,182.0,2.0,1.3,1408,1372,36,10.98,mountain,forest,blocked
+A18,A,229.0,2.0,1.3,1376,1372,4,0.83,mountain,mixed,partly blocked
+A19,A,178.0,2.0,1.3,1381,1372,9,2.67,mountain,built-up,clear
+A2,A,22.0,2.0,1.3,1377,1372,5,11.06,mountain,built-up,partly blocked
+A21,A,187.0,2.0,1.3,1372,1372,0,-0.21,mountain,open,clear
+A23,A,185.0,2.0,1.3,1382,1372,10,2.88,mountain,built-up,partly blocked
+A24,A,222.0,2.0,1.3,1393,1372,21,5.22,mountain,built-up,partly blocked
+A25,A,195.0,2.0,1.3,1399,1372,27,7.68,mountain,forest,partly blocked
+A26,A,137.0,2.0,1.3,1393,1372,21,8.43,mountain,forest,partly blocked
+A27,A,91.0,2.0,1.3,1386,1372,14,8.32,mountain,mixed,partly blocked
+A3,A,88.0,2.0,1.3,1398,1372,26,16.04,mountain,mixed,partly blocked
+A4,A,123.0,2.0,1.3,1407,1372,35,15.58,mountain,built-up,partly blocked
+A5,A,119.0,2.0,1.3,1404,1372,32,14.74,mountain,built-up,blocked
+A7,A,250.0,2.0,1.3,1390,1372,18,3.96,mountain,forest,blocked
+B1,B,209.0,1.0,1.3,1407,1357,50,13.53,mountain,built-up,partly blocked
+B10,B,1345.0,1.0,1.3,1432,1357,75,3.2,mountain,mixed,blocked
+B11,B,1329.0,1.0,1.3,1407,1357,50,2.17,mountain,mixed,partly blocked
+B12,B,1475.0,1.0,1.3,1409,1357,52,2.03,mountain,mixed,blocked
+B13,B,1656.0,1.0,1.3,1395,1357,38,1.32,mountain,built-up,partly blocked
+B14,B,1503.0,1.0,1.3,1383,1357,26,1.0,mountain,mixed,clear
+B17,B,1556.0,1.0,1.3,1384,1357,27,1.01,mountain,built-up,partly blocked
+B19,B,1738.0,1.0,1.3,1406,1357,49,1.62,mountain,built-up,partly blocked
+B2,B,290.0,1.0,1.3,1419,1357,62,12.12,mountain,mixed,clear
+B20,B,1954.0,1.0,1.3,1443,1357,86,2.53,mountain,mixed,partly blocked
+B21,B,1908.0,1.0,1.3,1462,1357,105,3.16,mountain,open,clear
+B22,B,1924.0,1.0,1.3,1470,1357,113,3.37,mountain,forest,clear
+B23,B,1756.0,1.0,1.3,1437,1357,80,2.62,mountain,forest,clear
+B24,B,1805.0,1.0,1.3,1420,1357,63,2.01,mountain,forest,clear
+B25,B,2020.0,1.0,1.3,1404,1357,47,1.34,mountain,forest,partly blocked
+B26,B,2095.0,1.0,1.3,1408,1357,51,1.4,mountain,forest,partly blocked
+B28,B,2719.0,1.0,1.3,1349,1357,-8,-0.16,mountain,forest,blocked
+B29,B,2916.0,1.0,1.3,1350,1357,-7,-0.13,mountain,forest,blocked
+B3,B,449.0,1.0,1.3,1429,1357,72,9.15,mountain,mixed,blocked
+B31,B,2189.0,1.0,1.3,1385,1357,28,0.74,mountain,forest,clear
+B33,B,2068.0,1.0,1.3,1362,1357,5,0.15,mountain,mixed,blocked
+B37,B,1216.0,1.0,1.3,1350,1357,-7,-0.32,mountain,built-up,blocked
+B42,B,959.0,1.0,1.3,1324,1357,-33,-1.95,mountain,mixed,blocked
+B43,B,680.0,1.0,1.3,1334,1357,-23,-1.91,mountain,mixed,blocked
+B44,B,707.0,1.0,1.3,1338,1357,-19,-1.52,mountain,mixed,blocked
+B48,B,753.0,1.0,1.3,1348,1357,-9,-0.66,mountain,mixed,blocked
+B49,B,831.0,1.0,1.3,1368,1357,11,0.78,mountain,mixed,clear
+B50,B,890.0,1.0,1.3,1422,1357,65,4.2,mountain,open,blocked
+B52,B,764.0,1.0,1.3,1382,1357,25,1.9,mountain,mixed,partly blocked
+B53,B,602.0,1.0,1.3,1400,1357,43,4.11,mountain,mixed,partly blocked
+B55,B,486.0,1.0,1.3,1330,1357,-27,-3.14,mountain,mixed,partly blocked
+B56,B,538.0,1.0,1.3,1337,1357,-20,-2.1,mountain,forest,blocked
+B58,B,784.0,1.0,1.3,1323,1357,-34,-2.46,mountain,mixed,blocked
+B7,B,1471.0,1.0,1.3,1470,1357,113,4.4,mountain,mixed,blocked
+B8,B,1402.0,1.0,1.3,1450,1357,93,3.81,mountain,mixed,blocked
+B9,B,1330.0,1.0,1.3,1437,1357,80,3.46,mountain,built-up,partly blocked
+C18,C,2100.0,9.0,1.3,1438,1376,62,1.48,mountain,mixed,blocked
+C26,C,2379.0,9.0,1.3,1496,1376,120,2.7,mountain,mixed,partly blocked
+C27,C,2379.0,9.0,1.3,1496,1376,120,2.7,mountain,mixed,partly blocked
+C38,C,2677.0,9.0,1.3,1663,1376,287,5.96,mountain,mixed,clear
+D10,D,3268.0,6.0,1.3,1431,1330,101,1.69,mountain,mixed,partly blocked
+D2,D,272.0,6.0,1.3,1326,1330,-4,-1.83,city,mixed,partly blocked
+D4,D,1403.0,6.0,1.3,1368,1330,38,1.36,city,mixed,blocked
+D6,D,2116.0,6.0,1.3,1369,1330,39,0.93,city,open,blocked
