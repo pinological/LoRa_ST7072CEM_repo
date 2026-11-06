@@ -24,7 +24,7 @@
 
 \begin{document}
 
-\title{Experimental Characterization of LoRa Propagation and Machine Learning Approaches for Path Loss Modeling Across Diverse Hill Terrains in Nepal}
+\title{Experimental Characterization of LoRa Propagation and Machine Learning Approaches for Path Loss Modeling Across Various Hill Terrain Types in Nepal}
 
 \author{\IEEEauthorblockN{Peter Karki}
 \IEEEauthorblockA{\textit{ST7072CEM Machine Learning}\\
@@ -37,7 +37,7 @@ Coventry ID: 17624929\\
 
 % ---------------------------------------------------------------------
 \begin{abstract}
-LoRa could support sensing in Nepal's hills, but most path loss models come from flat or urban areas. We built a two-node 866\,MHz instrument that, at each stop, sweeps six spreading factors (SF7--SF12) and three transmit powers (2, 8 and 14\dBm) with five packets each, and collected 61 complete sweeps (5,490 packet slots) in three hill-terrain case studies near Kathmandu. Models were validated grouped by stop and by leaving out a whole case. A depth-3 decision tree using only spreading factor and power predicted delivery with a balanced accuracy of 0.68, and 0.67 on an unseen case. Path loss was not predictable from distance or endpoint terrain features: no model beat the mean-only baseline (RMSE 11.1\dB), and a log-distance fit held only in the short-range case ($n = 2.10$). The cheapest setting delivering four of five packets needed a median 97\% less transmit energy than SF12 at 14\dBm. An interactive dashboard maps predicted dead zones on example terrain. In hill terrain, what lies between the antennas matters more than the distance between them.
+LoRa could support sensing in Nepal's hills, but most path loss models come from flat or urban areas. We built our own two-node 866\,MHz instrument with a fixed Station and a walking Roamer. At each stop, the Station sends a full sweep of six spreading factors (SF7--SF12) at three power levels (2, 8 and 14\dBm) with five packets each, so every place gives a small experiment rather than one measurement. Across three cases near Kathmandu, we collected 61 complete stops (5,490 packet slots). All packets from one stop always stayed together during training and testing, and whole cases were also held out. A depth-3 decision tree using only spreading factor and power predicted delivery with a balanced accuracy of 0.68, and 0.67 on an unseen case. Path loss was not predictable from distance or endpoint terrain features: no model beat the mean-only baseline (RMSE 11.1\dB), and a log-distance fit held only in the short-range case ($n = 2.10$). A short sweep at each site found settings that saved a median 97\% of transmit energy compared with SF12 at 14\dBm. An interactive dashboard maps predicted dead zones on example terrain. In hill terrain, what lies between the antennas matters more than the distance between them.
 \end{abstract}
 
 \begin{IEEEkeywords}
@@ -47,12 +47,12 @@ LoRa, path loss, machine learning, hill terrain, grouped cross-validation, Nepal
 % ---------------------------------------------------------------------
 \section{Introduction}
 
-LoRa is a long-range, low-power radio widely used for Internet of Things (IoT) sensing. In Nepal's hills it could support agriculture and hazard monitoring where cellular coverage is patchy. Planning such networks needs an estimate of path loss, usually from the log-distance model, in which loss grows with the logarithm of distance~\cite{rappaport2002}. Its parameters, however, come mostly from flat or urban areas. In hills, two points a few hundred metres apart may be separated by a ridge, while points kilometres apart across a valley may see each other clearly. Planners therefore rely on trial and error, and field data from such terrain are scarce for Nepal.
+LoRa is a low-power, long-range radio that is frequently used for Internet of Things (IoT) sensing. It could help with agriculture and hazard monitoring in areas of Nepal's hills where cellphone coverage is inconsistent. An estimate of path loss, often derived from the log-distance model in which loss increases with the logarithm of distance, is required for the planning of such networks~\cite{rappaport2002}. Its parameters, however, come mostly from flat or urban areas. While locations kilometres apart across a valley may be able to view each other clearly, two places a few hundred metres apart may be divided by a ridge. As a result, planners must rely on trial and error, and Nepal lacks field data from such terrain.
 
-Machine learning (ML) can add terrain information to path loss prediction, but two problems limit how far published results transfer: few studies cover hill terrain in South Asia, and random train--test splits can put measurements from the same place in both sets and overstate accuracy. We therefore built an instrument that tests every combination of six spreading factors and three transmit powers at each stop, which separates the effect of radio settings from that of location, and measured three contrasting case studies (Table~\ref{tab:caseintro}). The research questions are:
+Although machine learning (ML) can incorporate topography information into path loss prediction, the extent to which published results can be used is limited by two issues: random train--test splits might overstate accuracy by placing measurements from the same location in both sets, and few studies address hill terrain in South Asia. Therefore, we developed a device that measures three different case studies and tests every possible combination of six spreading factors and three transmit powers at each stop, separating the impact of radio settings from that of location (Table~\ref{tab:caseintro}). The research questions are:
 \begin{itemize}
     \item \textbf{RQ1:} Do distance and simple terrain features improve path loss prediction over log-distance or mean-only baselines?
-    \item \textbf{RQ2:} Do models trained in some terrain cases transfer to a different case?
+    \item \textbf{RQ2:} Can models that have been trained in one terrain case be used in another?
     \item \textbf{RQ3:} What is the cheapest radio setting each location needs?
 \end{itemize}
 
@@ -116,7 +116,7 @@ SRTM & Shuttle Radar Topography Mission \\
 \section{Literature Review}\label{sec:related}
 
 \subsection{Classical path loss models}
-The log-distance model fits a path loss exponent $n$ and a shadowing term to measurements~\cite{rappaport2002}. The Okumura--Hata model adds corrections for frequency and antenna heights, but assumes base stations above 30\,m and distances over 1\,km~\cite{hata1980}, and diffraction models such as ITU-R P.526 estimate the extra loss over hills~\cite{itu_p526}. At 866\,MHz these models differ by more than 40\dB at 1\,km, and none follows the spread of our stops (Fig.~\ref{fig:litmodels}).
+A path loss exponent $n$ and a shadowing term are fitted to observations by the log-distance model~\cite{rappaport2002}. The Okumura--Hata model adds corrections for frequency and antenna heights but assumes base stations above 30\,m and distances over 1\,km~\cite{hata1980}, while diffraction models such as ITU-R P.526 estimate the additional loss across hills~\cite{itu_p526}. At 866\,MHz these models differ by more than 40\dB at 1\,km, and none follows the spread of our stops (Fig.~\ref{fig:litmodels}).
 
 \begin{figure}[t]
 \centering
@@ -135,7 +135,7 @@ Petäjäjärvi \textit{et al.}~\cite{petajajarvi2015} measured LoRa at 868\,MHz 
 \label{fig:card-petajajarvi}
 \end{figure}
 
-Rademacher \textit{et al.}~\cite{rademacher2021} collected over 112,000 samples during 230 days in a 200\,km$^2$ urban area and compared eleven models. Log-distance, Okumura and Winner+ gave reasonable estimates, whereas terrain-based models gave no gain (Fig.~\ref{fig:card-rademacher}).
+In a 200\,km$^2$ urban region, Rademacher \textit{et al.}~\cite{rademacher2021} gathered more than 112,000 samples over the course of 230 days and compared eleven models. While terrain-based models provided no gain, log-distance, Okumura and Winner+ provided fair predictions (Fig.~\ref{fig:card-rademacher}).
 
 \begin{figure}[H]
 \centering
@@ -144,7 +144,7 @@ Rademacher \textit{et al.}~\cite{rademacher2021} collected over 112,000 samples 
 \label{fig:card-rademacher}
 \end{figure}
 
-In an Alpine canyon, Bianco \textit{et al.}~\cite{bianco2020} measured 868\,MHz LoRa with a single setting (SF7, 14\dBm) and reached only about 300\,m at 50\% delivery, far less than on flat ground (Fig.~\ref{fig:card-bianco}).
+Bianco \textit{et al.}~\cite{bianco2020} measured 868\,MHz LoRa in an Alpine canyon using a single setting (SF7, 14\dBm) and only reached roughly 300\,m at 50\% delivery, which is significantly less than on level ground (Fig.~\ref{fig:card-bianco}).
 
 \begin{figure}[H]
 \centering
@@ -153,7 +153,7 @@ In an Alpine canyon, Bianco \textit{et al.}~\cite{bianco2020} measured 868\,MHz 
 \label{fig:card-bianco}
 \end{figure}
 
-In Nepal, Pokharel \textit{et al.}~\cite{pokharel2024} recommended settings from one 433\,MHz link of about 5\,km, without ML (Fig.~\ref{fig:card-pokharel}). All four studies used one link or one radio setting at a time, which motivates multi-configuration measurements at many locations.
+Pokharel \textit{et al.}~\cite{pokharel2024} suggested settings from a single, roughly 5\,km 433\,MHz link in Nepal without ML (Fig.~\ref{fig:card-pokharel}). All four studies used one link or one radio setting at a time, which motivates multi-configuration measurements at many locations.
 
 \begin{figure}[H]
 \centering
@@ -172,16 +172,16 @@ Ojo \textit{et al.}~\cite{ojo2024} fed the sequence of land-cover classes along 
 \label{fig:card-ojo}
 \end{figure}
 
-Ethier and Châteauvert~\cite{ethier2024} showed, on 8.2 million measurements, that adding obstacle depth along the path cut the median RMSE by about 5\dB, to 7.5\dB (Fig.~\ref{fig:card-ethier}).
+Adding obstacle depth along the path reduced the median RMSE by around 5\dB, to 7.5\dB, as demonstrated by Ethier and Châteauvert~\cite{ethier2024} using 8.2 million observations (Fig.~\ref{fig:card-ethier}).
 
 \begin{figure}[H]
 \centering
 \includegraphics[width=\columnwidth]{card_ethier.png}
-\caption{Conceptual summary of~\cite{ethier2024}: median RMSE over six held-out cities. Drawn by the author.}
+\caption{Median RMSE across six held-out cities, conceptual overview of~\cite{ethier2024}. Drawn by the author.}
 \label{fig:card-ethier}
 \end{figure}
 
-Bitterling \textit{et al.}~\cite{bitterling2026} found that random forests~\cite{breiman2001} with LiDAR terrain features beat baselines under random splits but degraded when whole gateways were held out (Fig.~\ref{fig:card-bitterling}). Together these works suggest that terrain \emph{along the path} is informative and that validation design strongly affects reported accuracy. Decision trees~\cite{breiman1984} remain attractive for small datasets because their rules can be read and checked.
+Random forests~\cite{breiman2001} with LiDAR terrain features outperformed baselines under random splits, according to Bitterling \textit{et al.}~\cite{bitterling2026}, but deteriorated when entire gateways were held out (Fig.~\ref{fig:card-bitterling}). When taken as a whole, these studies imply that stated accuracy is significantly impacted by validation design and that the terrain \emph{along the path} is relevant. Because their rules can be read and verified, decision trees~\cite{breiman1984} continue to be appealing for small datasets.
 
 \begin{figure}[H]
 \centering
@@ -191,10 +191,10 @@ Bitterling \textit{et al.}~\cite{bitterling2026} found that random forests~\cite
 \end{figure}
 
 \subsection{Censoring and validation}
-Weak links are lost rather than measured, so ignoring them biases the fitted exponent; a Tobit estimator~\cite{tobin1958} corrects this~\cite{gustafson2015} (Fig.~\ref{fig:card-gustafson}). Samples grouped in space also make random cross-validation optimistic~\cite{roberts2017}; packets from one stop form such a group. LoRa data are strongly affected by both issues because many packets are lost at long range and each location yields many packets.
+Ignoring weak links biases the fitted exponent since they are lost rather than measured; this is corrected by a Tobit estimator~\cite{tobin1958,gustafson2015} (Fig.~\ref{fig:card-gustafson}). Samples grouped in space also make random cross-validation optimistic~\cite{roberts2017}; packets from one stop form such a group. Both problems have a significant impact on LoRa data since each site produces a large number of packets and many packets are lost at long range.
 
 \subsection{Why the reported metrics are not benchmarks}
-The studies answer different questions with different data: maximum range, delivery at one setting, mean error of a sequence model, or RMSE over held-out cities. Their frequencies, sample sizes, targets and validation schemes differ, so their numbers describe the field but cannot be ranked against each other or against this study. Table~\ref{tab:compare} therefore keeps each metric in its original form.
+The studies answer different questions with different data: maximum range, delivery at one setting, mean error of a sequence model, or RMSE over held-out cities. Their numbers describe the field but cannot be compared to this study or to each other because of differences in their frequencies, sample sizes, targets and validation techniques. As a result, Table~\ref{tab:compare} maintains each statistic in its original format.
 
 \begin{figure}[H]
 \centering
@@ -225,7 +225,7 @@ Bitterling~\cite{bitterling2026} & LPWAN gateways & RF + LiDAR & Drops on new ga
 \end{table*}
 
 \subsection{Research gap}
-No reviewed study combines multi-setting LoRa measurements in Himalayan foothills, explicit handling of censored and failed links, and ML validation that holds out whole terrain cases (Table~\ref{tab:gap}). This study is small, so it does not aim to outperform the reviewed work; it tests whether their approaches hold in a new setting.
+No reviewed study combines multi-setting LoRa measurements in Himalayan foothills, explicit handling of censored and failed links, and ML validation that holds out whole terrain cases (Table~\ref{tab:gap}). Due to its small size, this study checks whether the reviewed work's methods hold up in a different context rather than trying to outperform it.
 
 \begin{table}[t]
 \caption{Research gaps}\label{tab:gap}
@@ -248,10 +248,10 @@ Validation & Random splits~\cite{bitterling2026} & By stop and by case \\
 \section{Measurement Setup and Data}\label{sec:data}
 
 \subsection{LoRa background}
-LoRa uses chirp spread spectrum~\cite{semtech_an1200,augustin2016}. Each step from SF7 to SF12 doubles airtime and lowers the SNR needed for decoding by about 2.5\dB, down to about $-20$\dB at SF12. A higher SF therefore trades airtime and energy for range, and links can survive below the thermal noise floor. Each extra decibel of transmit power adds one decibel at the receiver. Testing every SF--power pair at one place shows how much margin a link has.
+LoRa uses chirp spread spectrum~\cite{semtech_an1200,augustin2016}. Each step from SF7 to SF12 doubles airtime, and the SNR required for decoding decreases by roughly 2.5\dB with each step, reaching approximately $-20$\dB at SF12. Thus, a greater SF allows links to endure below the thermal noise floor by exchanging airtime and energy for range. Each extra decibel of transmit power adds one decibel at the receiver. A link's margin can be determined by testing every SF--power pair in one location.
 
 \subsection{Instrument}
-Both nodes use an ESP32 and an Ai-Thinker Ra-08H module at 866.1\,MHz and 125\,kHz, inside the band Nepal assigns to IoT~\cite{nta2023} (Figs.~\ref{fig:hwinfo} and~\ref{fig:instrument}). The fixed \textit{Station} transmits; the walking \textit{Roamer} receives and logs every slot with RSSI, SNR and GPS position (5--10\,m accuracy). Custom radio firmware was written because the vendor firmware cannot change SF and power directly; it was frozen for all measurements and fingerprinted with SHA-256 so any change would be detectable. The Roamer firmware (version 4.6.0) logs every slot to a CSV file on a microSD card. Antenna gains and cable losses were not measured.
+Both nodes use an ESP32 and an Ai-Thinker Ra-08H module at 866.1\,MHz and 125\,kHz, which are within the spectrum that Nepal designates for IoT~\cite{nta2023} (Figs.~\ref{fig:hwinfo} and~\ref{fig:instrument}). The fixed \textit{Station} transmits; the walking \textit{Roamer} receives and logs every slot with RSSI, SNR and GPS position (5--10\,m accuracy). Since the vendor firmware cannot directly alter SF and power, custom radio firmware was created. It was frozen for all measurements and fingerprinted using SHA-256 so that any changes would be detected. The Roamer firmware (version 4.6.0) logs every slot to a CSV file on a microSD card. Cable losses and antenna gains were not quantified.
 
 \begin{figure*}[!t]
 \centering
@@ -270,7 +270,7 @@ Both nodes use an ESP32 and an Ai-Thinker Ra-08H module at 866.1\,MHz and 125\,k
 \end{figure*}
 
 \subsection{Sweep protocol}
-At each stop the Roamer requests a sweep over a control link (SF12, 14\dBm). The Station then sends five packets for each of 18 configurations, 90 slots in about 67\,s, each logged as OK or TIMEOUT (Table~\ref{tab:sweep}, Fig.~\ref{fig:sweep}). If the handshake fails (NOACK), no sweep runs, and the place is recorded as a failed attempt. In the Case~1 logs, sweeps after strong handshakes started 3.5--7\,s later and sweeps after weak handshakes 11--46\,s later, consistent with link margin rather than a clock fault.
+At each stop the Roamer requests a sweep over a control link (SF12, 14\dBm). Next, in roughly 67\,s, the Station sends five packets for each of the 18 configurations, totalling 90 slots, each of which is recorded as OK or TIMEOUT (Table~\ref{tab:sweep}, Fig.~\ref{fig:sweep}). If the handshake fails (NOACK), no sweep runs, and the place is recorded as a failed attempt. Sweeps following strong handshakes began 3.5--7\,s later in the Case~1 logs, but sweeps following weak handshakes began 11--46\,s later. This is consistent with link margin rather than a clock error.
 
 \begin{table}[t]
 \caption{Sweep configuration}\label{tab:sweep}
@@ -297,7 +297,7 @@ Control link & SF12, 14\dBm \\
 \end{figure}
 
 \subsection{Data and cleaning}
-The raw data are one Roamer log per site. They were combined, and only complete sweeps were kept: 61 stops (17, 36 and 8 per case), 5,490 slots and 2,612 received packets (47.6\%). The 56 failed handshakes reduce to 30 unique \textit{lost locations} (3, 9 and 18 per case) after removing retries within 30\,m of a completed stop. An earlier Site A run on older firmware was excluded because delivery at the same spots differed markedly. A scripted pipeline rebuilds the stop table (61 rows) and packet table (5,490 rows) from the raw logs and reproduces every reported number.
+The raw data are one Roamer log per site. They were combined, and only complete sweeps were kept: 61 stops (17, 36 and 8 per case), 5,490 slots and 2,612 received packets (47.6\%). The 56 failed handshakes reduce to 30 unique \textit{lost locations} (3, 9 and 18 per case) after removing retries within 30\,m of a completed stop. Due to significant differences in delivery at the same locations, an earlier Site A run on older firmware was eliminated. Every reported number is replicated by a scripted pipeline that reconstructs the stop table (61 rows) and packet table (5,490 rows) from the raw logs.
 
 % ---------------------------------------------------------------------
 \section{Methodology}\label{sec:method}
@@ -319,15 +319,15 @@ with $PL = P_{tx} - \mathrm{RSSI}$ and $\mathrm{cost}(c) = 10^{P/10}\cdot 2^{\ma
 \end{figure}
 
 \subsection{Features}
-Distance from Station to stop was computed with the haversine formula. Ground elevations of stops and Stations came from the SRTM 30\,m elevation model~\cite{farr2007}, giving the elevation difference (stop minus Station) and the elevation angle between the antennas. Land cover around each stop was labelled from satellite imagery as forest, built-up, mixed or open (14, 12, 31 and 4 stops) and one-hot encoded with forest as the reference. The models use $\log_{10}$ distance. Station antenna height (one value per site) and a manual line-of-sight label (made with delivery visible) were excluded to avoid leakage.
+The haversine formula was used to calculate the distance between the Station and the stop. The ground elevations of stops and Stations were taken from the SRTM 30\,m elevation model~\cite{farr2007}, which gave the elevation difference (stop minus Station) and the elevation angle between the antennas. Satellite imagery was used to identify the land cover surrounding each stop as forest, built-up, mixed or open (14, 12, 31 and 4 stops). Forest was then used as the reference for one-hot encoding. The models use $\log_{10}$ distance. Station antenna height (one value per site) and a manual line-of-sight label (made with delivery visible) were excluded to avoid leakage.
 
 \subsection{Models and why they were chosen}
-Path loss is continuous, so it is a regression problem: a mean-only baseline; the log-distance model $PL(d) = PL_0 + 10\,n\log_{10} d + X_\sigma$; least squares and ridge regression with terrain features (ridge suits few, correlated features); a depth-3 regression tree; and a 300-tree random forest. A Tobit fit on all packets treats each lost packet as path loss above its measurable limit~\cite{tobin1958,gustafson2015}.
+Since path loss is continuous, it is a regression problem. The models were a mean-only baseline; the log-distance model $PL(d) = PL_0 + 10\,n\log_{10} d + X_\sigma$; least squares and ridge regression with terrain features (ridge suits few, correlated features); a depth-3 regression tree; and a 300-tree random forest. When a Tobit fit is applied to all packets, every lost packet is treated as path loss above its measurable limit~\cite{tobin1958,gustafson2015}.
 
-Delivery is yes/no, so it is a classification problem. Depth-3 trees~\cite{breiman1984} with at least 90 packets per leaf were the main classifier: receiver sensitivity behaves like a threshold, the rules are readable, no leaf can memorise one stop, and the model is small enough for a node. Baselines were the majority class and a link-budget rule, which predicts delivery when the transmit power minus the log-distance prediction exceeds the sensitivity of the spreading factor; a random forest~\cite{breiman2001}, logistic regression and gradient boosting tested whether more flexible models help. Its random-split score was also recorded to show the effect of leakage. Neural networks were not used: with 61 independent locations, extra capacity would mainly memorise stops, and the sequence models that work well~\cite{ojo2024} relied on tens of thousands of links.
+Delivery is a classification problem since it is either yes or no. Depth-3 trees~\cite{breiman1984} with at least 90 packets per leaf were the main classifier: receiver sensitivity behaves like a threshold, the rules are readable, no leaf can memorise one stop, and the model is small enough for a node. Baselines were the majority class and a link-budget rule, which predicts delivery when the transmit power minus the log-distance prediction exceeds the sensitivity of the spreading factor; a random forest~\cite{breiman2001}, logistic regression and gradient boosting tested whether more flexible models help. Its random-split score was also recorded to show the effect of leakage. Neural networks were not used: with 61 independent locations, extra capacity would mainly memorise stops, and the sequence models that work well~\cite{ojo2024} relied on tens of thousands of links.
 
 \subsection{Validation and metrics}
-Packets from one stop share location and terrain, so they are not independent~\cite{roberts2017}. If one stop's packets appeared in both training and test sets, a model could recognise the stop instead of learning a general relationship. Every split therefore keeps a stop together (Fig.~\ref{fig:validation}). Regression used leave-one-stop-out (LOO) and leave-one-case-out (LOCO); classifiers used 10-fold cross-validation grouped by stop and LOCO. Metrics were RMSE, balanced accuracy, precision, recall, $F_1$, AUC and average precision:
+Packets from a single place are not independent since they share topography and location~\cite{roberts2017}. If one stop's packets appeared in both training and test sets, a model could recognise the stop instead of learning a general relationship. Thus, each split keeps the packets of a stop together (Fig.~\ref{fig:validation}). Classifiers employed 10-fold cross-validation grouped by stop and leave-one-case-out (LOCO), while regression employed leave-one-stop-out (LOO) and LOCO. Metrics were RMSE, balanced accuracy, precision, recall, $F_1$, AUC and average precision:
 \begin{align}
 \mathrm{RMSE} &= \sqrt{\tfrac{1}{N}\textstyle\sum_i (y_i-\hat{y}_i)^2}, \quad
 F_1 = \tfrac{2PR}{P+R}, \\
@@ -362,16 +362,16 @@ Threshold / seed & 0.5 / 0 \\
 \end{table}
 
 \subsection{Computational complexity}
-For $n$ samples and $d$ features, least squares costs $O(nd^2)$, a tree $O(d\,n\log n)$ to train and $O(\text{depth})$ to predict, a forest of $T$ trees $T$ times more, and Tobit $O(kn)$ for $k$ iterations. Training time, prediction time and model size were measured as medians of five single-thread runs on a 2.1\,GHz cloud machine. A depth-3 tree answers with at most three comparisons, which matters on a small node.
+Least squares costs $O(nd^2)$ for $n$ samples and $d$ features, a tree costs $O(d\,n\log n)$ to train and $O(\text{depth})$ to predict, a forest of $T$ trees costs $T$ times more, and Tobit costs $O(kn)$ for $k$ iterations. On a 2.1\,GHz cloud computer, the medians of five single-thread runs were used to calculate training time, prediction time and model size. On a small node, a depth-3 tree responds with no more than three comparisons.
 
 \subsection{Dashboard}
-A Gradio dashboard (Appendix~\ref{app:dash}) shows the results, re-runs grouped validation live and maps the tree's predicted dead zones on synthetic hill terrain, beside a geometric line-of-sight layer that the model cannot see. The expected receiver sensitivity used for the instrument check is the thermal noise floor ($\approx -117$\dBm for 125\,kHz and a 6\dB noise figure) plus the LoRa SNR limit of each spreading factor~\cite{semtech_an1200}.
+A Gradio dashboard (Appendix~\ref{app:dash}) plots the tree's predicted dead zones on artificial hill terrain next to a geometric line-of-sight layer that the model is unable to perceive, displays the findings, and performs grouped validation in real time. The expected receiver sensitivity used for the instrument check is the thermal noise floor ($\approx -117$\dBm for 125\,kHz and a 6\dB noise figure) plus the LoRa SNR limit of each spreading factor~\cite{semtech_an1200}.
 
 % ---------------------------------------------------------------------
 \section{Results}\label{sec:results}
 
 \subsection{Instrument and delivery}
-The weakest received packets matched the expected sensitivity: $-124$\dBm at SF7 (expected $-124.5$) and $-134$\dBm at SF12 (expected $-137$) (Fig.~\ref{fig:inst}). The lowest SNRs ($-10$ to $-21$\dB) were within about 2.5\dB of the demodulation limits, so the radios behaved as specified. Raising power from 2 to 14\dBm raised the median RSSI at the same stop and SF by 15.3\dB, not the nominal 12\dB (8 to 14\dBm: 8\dB; 2 to 8\dBm: 7\dB), which supports using only 14\dBm packets for path loss. Delivery rose with SF and power in every case, from 16\% at SF7/2\dBm to 88\% at SF12/14\dBm (Fig.~\ref{fig:heat}). At SF12/14\dBm, delivery was 75\%, 92\% and 95\% in Cases 1--3. Case~1 delivered only 2\% at SF7/2\dBm, against 24\% in Case~2, consistent with heavy obstruction at short range. Most stops were neither fully connected nor disconnected, the regime in which configuration choices matter most. Differences between cases were not significant (Kruskal--Wallis $p = 0.18$ for delivery, $p = 0.34$ for path loss; Table~\ref{tab:cases}).
+The weakest received packets matched the expected sensitivity: $-124$\dBm at SF7 (expected $-124.5$) and $-134$\dBm at SF12 (expected $-137$) (Fig.~\ref{fig:inst}). The radios behaved as expected because the lowest SNRs ($-10$ to $-21$\dB) were within around 2.5\dB of the demodulation limits. Raising power from 2 to 14\dBm raised the median RSSI at the same stop and SF by 15.3\dB, not the nominal 12\dB (8 to 14\dBm: 8\dB; 2 to 8\dBm: 7\dB), which supports using only 14\dBm packets for path loss. In all cases, delivery increased with SF and power, rising from 16\% at SF7/2\dBm to 88\% at SF12/14\dBm (Fig.~\ref{fig:heat}). At SF12/14\dBm, delivery was 75\%, 92\% and 95\% in Cases 1--3. In contrast to Case~2, which delivered 24\% at SF7/2\dBm, Case~1 delivered only 2\%, indicating significant obstruction at close range. The majority of stops were neither completely connected nor disconnected, which is the regime where configuration decisions are most important. Differences between cases were not significant (Kruskal--Wallis $p = 0.18$ for delivery, $p = 0.34$ for path loss; Table~\ref{tab:cases}).
 
 \begin{figure}[t]
 \centering
@@ -413,7 +413,7 @@ $\rho$(delivery, elev.\ diff.) & $-0.26$ & $0.49^{*}$ & $-0.04$ \\
 \end{table}
 
 \subsection{Path loss, distance and link existence}
-Pooled over 60 stops, path loss was nearly independent of distance ($n = 0.14$, 95\% CI $-0.44$ to 0.72, $\sigma = 11.1$\dB; Fig.~\ref{fig:pl}, Table~\ref{tab:fits}). Only Case~1 followed the expected trend ($n = 2.10$, $R^2 = 0.41$). Case~2 showed no trend, with path loss at similar distances ranging from about 100 to 145\dB, and the Case~3 fit rests on eight stops with a confidence interval that includes zero. The censoring-aware Tobit fit was also flat ($n = -0.12$, CI $-1.12$ to 0.64). Delivery rose with the stop's elevation above the Station ($\rho = 0.33$, $p = 0.008$), driven by Case~2 ($\rho = 0.49$), while delivery fell with distance only in Case~1 ($\rho = -0.58$). Counting the 30 lost locations, link success fell from 91\% within 300\,m to 52\% at 2--4\,km, and was only 31\% in Case~3 (Fig.~\ref{fig:link}).
+Path loss was almost independent of distance when pooled over 60 stops ($n = 0.14$, 95\% CI $-0.44$ to 0.72, $\sigma = 11.1$\dB; Fig.~\ref{fig:pl}, Table~\ref{tab:fits}). Only Case~1 followed the expected trend ($n = 2.10$, $R^2 = 0.41$). Case~3's fit is based on eight stops with a confidence interval that includes zero, while Case~2's path loss at comparable distances ranged from roughly 100 to 145\dB and showed no pattern. The censoring-aware Tobit fit was also flat ($n = -0.12$, CI $-1.12$ to 0.64). Delivery rose with the stop's elevation above the Station ($\rho = 0.33$, $p = 0.008$), driven by Case~2 ($\rho = 0.49$), while delivery fell with distance only in Case~1 ($\rho = -0.58$). Link success decreased from 91\% within 300\,m to 52\% at 2--4\,km, and it was only 31\% in Case~3 when the 30 lost locations were taken into account (Fig.~\ref{fig:link}).
 
 \begin{figure}[t]
 \centering
@@ -449,7 +449,7 @@ Tobit, Case 1 & 73.2 & 3.09 & -- & -- & 12.4 \\
 \end{figure}
 
 \subsection{Path loss regression}
-No model beat the mean-only baseline (Table~\ref{tab:reg}, Fig.~\ref{fig:rmse}). Under LOCO, terrain features raised the error to 15.0--15.8\dB, including for the random forest, against 11.4\dB for the baseline and 13.0\dB for log-distance; the largest errors occurred when Case~3 was held out. Within one case, elevation helped slightly: in Case~1 the LOO RMSE fell from 8.7 to 7.2\dB. Restricting the data to 51 stops with at least ten received packets gave the same picture. The excluded manual line-of-sight label did separate delivery (27\%, 53\% and 76\% for blocked, partly blocked and clear), which shows that path obstruction matters.
+No model beat the mean-only baseline (Table~\ref{tab:reg}, Fig.~\ref{fig:rmse}). Under LOCO, terrain features raised the error to 15.0--15.8\dB, including for the random forest, against 11.4\dB for the baseline and 13.0\dB for log-distance; the largest errors occurred when Case~3 was held out. Elevation was somewhat helpful within one case: in Case~1, the LOO RMSE decreased from 8.7 to 7.2\dB. Restricting the data to 51 stops with at least ten received packets gave the same picture. The excluded manual line-of-sight label did separate delivery (27\%, 53\% and 76\% for blocked, partly blocked and clear), which shows that path obstruction matters.
 
 \begin{table}[t]
 \caption{Path loss regression RMSE (dB)}\label{tab:reg}
@@ -478,7 +478,7 @@ Random forest & 11.3 & 15.0 & 11.8 / 16.5 / 13.0 \\
 \end{figure}
 
 \subsection{Delivery classification}
-A depth-3 tree on SF and power reached a balanced accuracy of 0.68 (AUC 0.71), and 0.67 under LOCO, holding at 0.69, 0.67 and 0.72 for the held-out Cases 1--3 (Table~\ref{tab:clfmetrics}). Adding terrain features lowered LOCO to 0.50 (Fig.~\ref{fig:clf}). The random forest scored 0.89 under a random packet split but 0.65 grouped and 0.55 on an unseen case: it recognised stops rather than learning transferable rules. The tree was the most precise model (0.70); the link-budget rule predicted almost every packet as delivered (recall 0.97, precision 0.50). Gradient boosting was marginally best within known cases (AUC 0.75) but fell to 0.58 on an unseen case (Fig.~\ref{fig:roc}). Of 2,878 lost packets, the tree flagged 2,217 correctly, and it found 1,534 of 2,612 delivered ones. A learning curve rose from 0.57 with 9 training stops to 0.62--0.64 with 39--49 stops and then levelled off. The tree fitted to all data splits first on power ($\le$11\dBm): at low power, delivery is likely only when the stop lies more than about 57\,m above the Station, and at 14\dBm SF11--12 delivers most packets (Fig.~\ref{fig:tree}).
+A depth-3 tree on SF and power reached a balanced accuracy of 0.68 (AUC 0.71), and 0.67 under LOCO, holding at 0.69, 0.67 and 0.72 for the held-out Cases 1--3 (Table~\ref{tab:clfmetrics}). LOCO was reduced to 0.50 by adding terrain features (Fig.~\ref{fig:clf}). The random forest scored 0.89 under a random packet split but 0.65 grouped and 0.55 on an unseen case: it recognised stops rather than learning transferable rules. The tree was the most precise model (0.70); the link-budget rule predicted almost every packet as delivered (recall 0.97, precision 0.50). Within known cases, gradient boosting performed slightly better (AUC 0.75), but on an unseen case it dropped to 0.58 (Fig.~\ref{fig:roc}). The tree accurately identified 2,217 of the 2,878 lost packets and found 1,534 of the 2,612 delivered ones. The learning curve increased from 0.57 with nine training stops to 0.62--0.64 with 39--49 stops before levelling off. The tree fitted to all data splits first on power ($\le$11\dBm): SF11--12 delivers the majority of packets at 14\dBm, and at low power, delivery is expected only when the stop is more than roughly 57\,m above the Station (Fig.~\ref{fig:tree}).
 
 \begin{table}[t]
 \caption{Delivery metrics, 10-fold grouped (threshold 0.5)}\label{tab:clfmetrics}
@@ -522,7 +522,7 @@ Grad.\ boosting, all & 0.68 & 0.66 & 0.67 & \textbf{0.67} & \textbf{0.75} & \tex
 \end{figure*}
 
 \subsection{Cheapest setting and computational cost}
-At 55 of 61 stops a setting delivered at least four of five packets; 19 needed only SF9 or below at 8\dBm or below, and 7 needed SF11--12 at 14\dBm. The median stop could have used 97\% less energy than SF12 at 14\dBm (92\% in Case~3). These choices rest on five packets per setting, so they describe what was measured rather than a guaranteed long-term setting. The delivery tree trained in about 1--3\,ms and occupied about 2\,kB, whereas the forest took 0.86\,s and about 24\,MB without performing better (Table~\ref{tab:compute}).
+At 55 of 61 stops, a setting delivered at least four out of five packets; 19 required only SF9 or below at 8\dBm or below, and 7 required SF11--12 at 14\dBm. The median stop could have used 97\% less energy than SF12 at 14\dBm (92\% in Case~3). These choices indicate what was measured rather than a guaranteed long-term setting because they are based on five packets per setting. The delivery tree trained in about 1--3\,ms and occupied about 2\,kB, whereas the forest took 0.86\,s and about 24\,MB without performing better (Table~\ref{tab:compute}).
 
 \begin{table}[t]
 \caption{Measured computational cost}\label{tab:compute}
@@ -558,42 +558,42 @@ RF classifier & $O(Td\,n\log n)$ & 865 & 24,405 \\
 \begin{itemize}
     \item \textbf{RQ1:} Distance and endpoint terrain features did not beat the mean-only baseline; distance mattered only in Case~1 and for whether a link formed at all.
     \item \textbf{RQ2:} Radio-setting models transferred (0.67 on an unseen case); terrain-feature and more flexible models did not.
-    \item \textbf{RQ3:} The cheapest setting varied widely between stops, and most stops needed far less energy than the safest setting.
+    \item \textbf{RQ3:} Most stops required significantly less energy than the safest setting, and the cheapest setting varied greatly between stops.
 \end{itemize}
 Fig.~\ref{fig:keyfind} summarises these findings.
 
 \subsection{Why distance and terrain features failed}
-Three effects flatten the pooled distance trend. Censoring removes the weakest packets, although the Tobit fit shows it is not the whole story. Survivorship hides 30 mostly distant locations where no link formed. Including the lost locations, link success falls from 91\% to 52\% with distance, a trend the sweep data alone hide. Mixed terrain means distant stops across a valley can see the Station better than nearby stops behind a ridge; the positive link between delivery and stop elevation in Case~2 supports this. Endpoint features describe the two ends of a link but not the terrain between them, which matches the gains reported from path features~\cite{ojo2024,ethier2024} and the drop on held-out gateways~\cite{bitterling2026}.
+Three effects flatten the pooled distance trend. Censoring eliminates the weakest packets, but the Tobit fit indicates that this is not the complete picture. Survivorship hides 30 mostly distant locations where no link formed. Including the lost locations, link success falls from 91\% to 52\% with distance, a trend the sweep data alone hide. Because of mixed terrain, distant stops across a valley can have a better view of the Station than nearby stops behind a ridge; Case~2's positive correlation between delivery and stop elevation supports this. Endpoint features characterise the two ends of a link but not the terrain between them, which is consistent with the gains reported from path features~\cite{ojo2024,ethier2024} and the drop on held-out gateways~\cite{bitterling2026}.
 
 \subsection{Why features did not transfer}
-Within one case, terrain features helped slightly; across cases they encoded case-specific relationships and raised the error, especially for the small Case~3. A model trained where height above the Station predicted delivery (Case~2) misled it where distance mattered instead (Case~1). This is the same failure Bitterling \textit{et al.}~\cite{bitterling2026} saw when whole gateways were held out, and it is why only small, interpretable models were used.
+Terrain features were somewhat helpful within one case, but across cases they encoded case-specific correlations and increased the error, particularly for the small Case~3. A model that was trained where height above the Station predicted delivery (Case~2) misled it where distance was more important (Case~1). Bitterling \textit{et al.}~\cite{bitterling2026} observed the same failure when entire gateways were held out, which is why only small, interpretable models were employed.
 
 \subsection{Was the model choice justified?}
-Yes. Every flexible model lost accuracy on an unseen case, while both SF + power models kept it. The shallow tree matched the best transferable model, was the most precise, used three readable rules and was about 10,000 times smaller than the forest. Regression was the right framing for path loss, but no regression model, simple or flexible, beat the mean: the limit was the information in the features, not the model. With 61 stops, simplicity was a strength rather than a compromise.
+Yes. Every flexible model lost accuracy on an unseen case, while both SF + power models kept it. The shallow tree matched the best transferable model, was the most precise, employed three readable rules and was around 10,000 times smaller than the forest. Regression was the appropriate framework for path loss, but no regression model---no matter how basic or sophisticated---beat the mean; the information in the features, not the model, was the limit. With 61 stops, simplicity was a strength, not a compromise.
 
 \subsection{Comparison and practical use}
-The Case~1 exponent (2.10) is close to free space, and the shadowing values (5.8--12.6\dB) are typical for outdoor LoRa. Unlike flat-terrain ranges of tens of kilometres~\cite{petajajarvi2015}, 48\% of hill locations beyond 2\,km formed no link, so a setting recommended from one link~\cite{pokharel2024} should not be reused elsewhere. The censoring-corrected Case~1 exponent (3.09) is closer to values typical of obstructed links. The larger-sample models in the literature reach 4.97 to 7.5\dB~\cite{ojo2024,ethier2024} because they describe the whole path. For practice, a planner without terrain data can expect most packets to arrive at SF11--12 and 14\dBm, but this safe setting wastes most of the energy at a typical stop. A short on-site sweep finds a much cheaper setting per node, path loss from distance alone should carry an uncertainty of about 11\dB, and the tiny tree could run on the node itself.
+The shadowing levels (5.8--12.6\dB) are common for outdoor LoRa, while the Case~1 exponent (2.10) is close to free space. A setting suggested from one link~\cite{pokharel2024} should not be applied elsewhere since, in contrast to flat-terrain ranges of tens of kilometres~\cite{petajajarvi2015}, 48\% of hill locations beyond 2\,km formed no link. The censoring-corrected Case~1 exponent (3.09) is more in line with values for obstructed links. The larger-sample models in the literature reach 4.97 to 7.5\dB~\cite{ojo2024,ethier2024} because they describe the whole path. For practice, a planner without terrain data can expect most packets to arrive at SF11--12 and 14\dBm; however, at a typical stop, this safe setting wastes the majority of the energy. A short on-site sweep finds a much cheaper setting per node, path loss from distance alone should carry an uncertainty of about 11\dB, and the tiny tree could run on the node itself.
 
 \subsection{Ethics and reproducibility}
-No personal data were collected,. Site names and coordinates are withheld from the paper and the dashboard so that private properties cannot be located. Predictions and the dead-zone map are research outputs, not coverage guarantees for safety uses. The analysis notebook rebuilds every table and figure from the raw logs, and the dashboard reproduces the main classifier result.
+No personal data were collected. Site names are coded as Sites A--D. The GPS positions of the stops and Stations are kept out of the paper text, but they are published in the raw logs so the analysis can be reproduced. Predictions and the dead-zone map are research outputs, not coverage guarantees for safety uses. The dashboard replicates the main classifier result, while the analysis notebook reconstructs each table and figure from the raw logs.
 
 % ---------------------------------------------------------------------
 \section{Limitations and Future Work}\label{sec:limits}
 \subsection{Limitations}
-This is a small study: 61 complete stops, only eight in Case~3, from two rooftop Stations of different estimated height, all in one season. Antenna gains were not measured, so path loss is apparent rather than absolute, and rooftop heights were estimated. GPS accuracy is about 5--10\,m, SRTM resolution of 30\,m limits the elevation features, and the Station-side log was unavailable. The dead-zone map applies a model trained on 61 stops to invented terrain and is an illustration only. Results describe this area and should not be generalised beyond the three cases.
+This is a small study: 61 complete stops, only eight in Case~3, from two rooftop Stations of different estimated height, all in one season. Since antenna gains were not measured, path loss is apparent rather than absolute, and rooftop heights were estimated. GPS accuracy is about 5--10\,m, SRTM resolution of 30\,m limits the elevation features, and the Station-side log was unavailable. The dead-zone map applies a model trained on 61 stops to invented terrain and is an illustration only. The findings are specific to this area and should not be generalised beyond the three cases.
 
 \subsection{Future work}
-More stops, cases and seasons would allow firmer cross-case validation. Station-side logging and measured antenna gains would give absolute path loss. Terrain-profile features computed along each path, such as obstruction depth~\cite{ethier2024} or knife-edge diffraction loss~\cite{itu_p526}, should be tested with censoring-aware models and the same strict validation. Finally, the sweep could become an adaptive procedure in which a node tries settings from cheapest to most expensive and keeps the first that works.
+More stops, cases and seasons would provide stronger cross-case validation. Station-side logging and measured antenna gains would give absolute path loss. Terrain-profile features computed along each path, such as obstruction depth~\cite{ethier2024} or knife-edge diffraction loss~\cite{itu_p526}, should be tested with censoring-aware models and the same strict validation. Lastly, the sweep might develop into an adaptive process in which a node tries settings from the least expensive to the most costly, keeping the first that works.
 
 % ---------------------------------------------------------------------
 \section{Conclusion}\label{sec:conclusion}
-Across 61 stops in three hill-terrain cases, delivery was governed by spreading factor and power, and a shallow tree on these two settings kept its accuracy on an unseen case while being among the cheapest models. More flexible models, including random forests and gradient boosting, did not transfer better. Path loss could not be predicted from distance or endpoint terrain better than by its mean (RMSE 11.1\dB), and a log-distance model held only in the short-range obstructed case. Per-stop settings could save a median 97\% of transmit energy. Receiver censoring, unrecorded failed links and terrain mixing explain much of this. In hill terrain, what lies between the antennas matters more than the distance between them.
+Across 61 stops in three hill-terrain cases, delivery was governed by spreading factor and power, and a shallow tree on these two settings kept its accuracy on an unseen case while being among the cheapest models. More flexible models, including random forests and gradient boosting, did not transfer better. Path loss could not be predicted from distance or endpoint terrain better than by its mean (RMSE 11.1\dB), and a log-distance model held only in the short-range obstructed case. Per-stop adjustments could save a median of 97\% of transmit energy. Receiver censoring, unrecorded failed links and terrain mixing explain much of this. In hill terrain, what lies between the antennas matters more than the distance between them.
 
 \section*{Acknowledgment}
-I thank my module tutors at Softwarica College of IT and E-Commerce for their guidance and feedback. Generative AI tools assisted with code, figure layout and language editing; the experiment design, field measurements, analysis decisions and conclusions are my own, and every reported number was checked against the analysis notebook.
+I thank my module tutors at Softwarica College of IT and E-Commerce for their guidance and feedback. Code, figure layout and language editing were aided by generative AI tools; I was responsible for the experiment design, field measurements, analysis choices and findings, and each reported number was verified against the analysis notebook.
 
 \section*{Data Availability}
-The raw Roamer logs, stop features, analysis notebook and dashboard code are available from the author on request. Site names and exact locations are withheld.
+Appendix~\ref{app:links} contains links to the dashboard code, stop features, analysis notebook and raw Roamer logs. The raw logs include GPS positions; site names are coded.
 
 % ---------------------------------------------------------------------
 \begin{thebibliography}{00}
@@ -601,29 +601,32 @@ The raw Roamer logs, stop features, analysis notebook and dashboard code are ava
 \bibitem{rappaport2002}
 T.~S. Rappaport, \emph{Wireless Communications: Principles and Practice}, 2nd~ed. Upper Saddle River, NJ, USA: Prentice Hall, 2002.
 
-\bibitem{hata1980}
-M.~Hata, ``Empirical formula for propagation loss in land mobile radio services,'' \emph{IEEE Trans. Veh. Technol.}, vol.~29, no.~3, pp.~317--325, 1980.
-
-\bibitem{itu_p526}
-ITU-R, ``Propagation by diffraction,'' Recommendation ITU-R P.526, International Telecommunication Union, Geneva, Switzerland.
-
 \bibitem{petajajarvi2015}
 J.~Petäjäjärvi, K.~Mikhaylov, A.~Roivainen, T.~Hänninen, and M.~Pettissalo, ``On the coverage of LPWANs: Range evaluation and channel attenuation model for LoRa technology,'' in \emph{Proc. 14th Int. Conf. ITS Telecommunications (ITST)}, 2015, doi:10.1109/ITST.2015.7377400.
 
 \bibitem{rademacher2021}
 M.~Rademacher, H.~Linka, T.~Horstmann, and M.~Henze, ``Path loss in urban LoRa networks: A large-scale measurement study,'' \emph{arXiv preprint arXiv:2109.07768}, 2021.
 
+\bibitem{hata1980}
+M.~Hata, ``Empirical formula for propagation loss in land mobile radio services,'' \emph{IEEE Trans. Veh. Technol.}, vol.~29, no.~3, pp.~317--325, 1980.
+
+\bibitem{itu_p526}
+ITU-R, ``Propagation by diffraction,'' Recommendation ITU-R P.526, International Telecommunication Union, Geneva, Switzerland.
+
 \bibitem{bianco2020}
 G.~M. Bianco, A.~Mejia-Aguilar, and G.~Marrocco, ``Radio wave propagation of LoRa systems in mountains for search and rescue operations,'' in \emph{Proc. URSI General Assembly and Scientific Symposium (URSI GASS)}, 2020.
+
+\bibitem{ethier2024}
+J.~Ethier and M.~Châteauvert, ``Machine learning-based path loss modeling with simplified features,'' \emph{arXiv preprint arXiv:2405.10006}, 2024.
 
 \bibitem{pokharel2024}
 A.~Pokharel, P.~Sapkota, D.~Sapkota, S.~Dahal, S.~Karki, and R.~K. Budhathoki, ``Performance evaluation of LoRa technology for rural connectivity: An experimental analysis in Nepal,'' \emph{arXiv preprint arXiv:2412.04563}, 2024.
 
-\bibitem{bitterling2026}
-R.~Bitterling, C.~Nettersheim, J.~Hees, and M.~Rademacher, ``A systematic sample size analysis of ML-based path loss prediction for LPWAN,'' \emph{arXiv preprint arXiv:2608.11083}, 2026.
-
 \bibitem{breiman2001}
 L.~Breiman, ``Random forests,'' \emph{Machine Learning}, vol.~45, no.~1, pp.~5--32, 2001, doi:10.1023/A:1010933404324.
+
+\bibitem{bitterling2026}
+R.~Bitterling, C.~Nettersheim, J.~Hees, and M.~Rademacher, ``A systematic sample size analysis of ML-based path loss prediction for LPWAN,'' \emph{arXiv preprint arXiv:2608.11083}, 2026.
 
 \bibitem{breiman1984}
 L.~Breiman, J.~H. Friedman, R.~A. Olshen, and C.~J. Stone, \emph{Classification and Regression Trees}. Belmont, CA, USA: Wadsworth, 1984.
@@ -639,9 +642,6 @@ C.~Gustafson, T.~Abbas, D.~Bolin, and F.~Tufvesson, ``Statistical modeling and e
 
 \bibitem{roberts2017}
 D.~R. Roberts \emph{et al.}, ``Cross-validation strategies for data with temporal, spatial, hierarchical, or phylogenetic structure,'' \emph{Ecography}, vol.~40, no.~8, pp.~913--929, 2017, doi:10.1111/ecog.02881.
-
-\bibitem{ethier2024}
-J.~Ethier and M.~Châteauvert, ``Machine learning-based path loss modeling with simplified features,'' \emph{arXiv preprint arXiv:2405.10006}, 2024.
 
 \bibitem{semtech_an1200}
 Semtech Corporation, ``LoRa modulation basics,'' Application Note AN1200.22, 2015.
@@ -702,14 +702,20 @@ Fig.~\ref{fig:hardware} shows the Roamer carried during the field walk and its i
 \end{figure*}
 
 \section{Interactive dashboard}\label{app:dash}
-Fig.~\ref{fig:dash} shows the Gradio dashboard. It has seven tabs: overview, delivery explorer, path loss, model results, a model lab, the dead-zone map, and method and limits. It reads the raw logs with relative paths, removes coordinates, and runs locally or in Google Colab. The model lab reproduces the SF + power tree result live (balanced accuracy 0.68, AUC 0.71, LOCO 0.67). The dead-zone map is an illustration on synthetic terrain: where the tree's prediction and the line-of-sight layer disagree marks the information that endpoint features cannot capture.
+Fig.~\ref{fig:dash} shows the Gradio dashboard in dark mode. Global filters for case, distance and land cover update every tab: overview, delivery explorer, path loss, settings advisor, model lab, dead-zone map and results. The settings advisor suggests the cheapest setting for a new node and shows the most similar measured stops as evidence. The SF + power tree result (balanced accuracy 0.68, AUC 0.71, precision 0.70, recall 0.59) is replicated in real time by the model lab. The dead-zone map is an illustration on synthetic terrain: where the tree and the line-of-sight layer disagree marks the information that endpoint features cannot capture.
 
-\begin{figure*}[t]
+\begin{figure*}[!t]
 \centering
-\begin{subfigure}[t]{0.49\textwidth}\centering\includegraphics[width=\linewidth]{dash_overview.jpg}\caption{Overview}\end{subfigure}\hfill
-\begin{subfigure}[t]{0.49\textwidth}\centering\includegraphics[width=\linewidth]{dash_deadzone3d.jpg}\caption{Dead-zone map, 3-D view}\end{subfigure}
-\caption{Gradio dashboard (no site names or coordinates).}
+\begin{subfigure}[t]{0.49\textwidth}\centering\includegraphics[width=\linewidth]{dash_overview.jpg}\caption{Overview with filters and summary cards}\end{subfigure}\hfill
+\begin{subfigure}[t]{0.49\textwidth}\centering\includegraphics[width=\linewidth]{dash_advisor.jpg}\caption{Settings advisor}\end{subfigure}\\[4pt]
+\begin{subfigure}[t]{0.49\textwidth}\centering\includegraphics[width=\linewidth]{dash_modellab.jpg}\caption{Model lab: ROC curve and confusion matrix}\end{subfigure}\hfill
+\begin{subfigure}[t]{0.49\textwidth}\centering\includegraphics[width=\linewidth]{dash_deadzone3d.jpg}\caption{Dead-zone map, isometric 3-D view}\end{subfigure}
+\caption{Gradio dashboard, dark mode (no site names or coordinates).}
 \label{fig:dash}
 \end{figure*}
+
+\section{Video and source code}\label{app:links}
+\noindent Video demonstration: \url{https://youtu.be/8JvQkfrFH3Q}\\
+GitHub repository (notebook, data and dashboard): \url{https://github.com/pinological/LoRa_ST7072CEM_repo}
 
 \end{document}
