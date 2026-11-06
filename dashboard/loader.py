@@ -61,3 +61,31 @@ def load_data(data_dir=None):
     p = p.drop(columns=['lat', 'lon', 'phone_lat', 'phone_lon', 'gps_alt_m', 'phone_alt_m'], errors='ignore')
     s = s.drop(columns=['lat', 'lon'])
     return p, s, lost
+
+
+def load_locations(data_dir=None):
+    """Real positions for the local Field map tab only (stops, Stations, lost locations)."""
+    data_dir = Path(data_dir) if data_dir else find_data_dir()
+    logs = []
+    for f in sorted(glob.glob(str(data_dir / 'raw' / 'site_*_roamer_log.csv'))):
+        d = pd.read_csv(f)
+        d['site'] = Path(f).name.split('_')[1]
+        logs.append(d)
+    log = pd.concat(logs, ignore_index=True)
+    sw = log[log.status.isin(['OK', 'TIMEOUT'])].copy()
+    sw['stop_key'] = sw.site + sw.stop_id.astype(int).astype(str)
+    n = sw.groupby('stop_key').size()
+    sw = sw[sw.stop_key.isin(n[n == 90].index)]
+    stops = sw.groupby('stop_key').agg(lat=('lat', 'median'), lon=('lon', 'median')).reset_index()
+    st = pd.read_csv(data_dir / 'stations.csv')
+    fails = log[log.status == 'NOACK'][['site', 'stop_id', 'lat', 'lon']].sort_values(['site', 'stop_id'])
+    sp = stops.assign(site=stops.stop_key.str[0])
+    fails['near'] = [hav(r.lat, r.lon, sp[sp.site == r.site].lat.values, sp[sp.site == r.site].lon.values).min()
+                     for r in fails.itertuples()]
+    keep = []
+    for r in fails[fails.near > 30].itertuples():
+        if not any(k.site == r.site and hav(r.lat, r.lon, k.lat, k.lon) < 30 for k in keep):
+            keep.append(r)
+    lost = pd.DataFrame(keep)[['site', 'lat', 'lon']]
+    lost['case'] = lost.site.map(CASE)
+    return stops, st, lost

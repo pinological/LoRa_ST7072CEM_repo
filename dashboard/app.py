@@ -26,7 +26,7 @@ from sklearn.model_selection import GroupKFold, LeaveOneGroupOut, KFold, cross_v
 from sklearn.metrics import (balanced_accuracy_score, roc_auc_score, roc_curve, confusion_matrix,
                              precision_score, recall_score, f1_score)
 
-from loader import find_data_dir, load_data
+from loader import find_data_dir, load_data, load_locations
 
 # ------------------------------------------------------------------ data
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -40,6 +40,11 @@ except FileNotFoundError:
     PK = pd.read_csv(os.path.join(D, "packets.csv"))
     LOST = pd.read_csv(os.path.join(D, "lost_locations.csv"))
     DATA_SOURCE = "anonymised tables in data/"
+try:
+    LOC_STOPS, LOC_STATIONS, LOC_LOST = load_locations(DATA_DIR)
+    HAS_MAP = True
+except Exception:
+    HAS_MAP = False
 print("Data source:", DATA_SOURCE, "|", len(PK), "packets,", len(STOPS), "stops,", len(LOST), "lost locations")
 
 SFS, PWRS = [7, 8, 9, 10, 11, 12], [2, 8, 14]
@@ -462,6 +467,70 @@ def dead_zone(seed, rugged, sx, sy, s_ant, sf, pwr, lc, layer, thr):
     return f3, f2, html
 
 
+# ------------------------------------------------------------------ field map (local only: real positions)
+ESRI = "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
+ESRI_LABELS = "https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}"
+
+
+def field_map(cases, dmax, lcs, colour, show_lost, show_links, stop):
+    s, _, _ = filt(cases, dmax, lcs)
+    d = s.merge(LOC_STOPS, on="stop_key")
+    if not len(d): return empty(), ""
+    cs = [int(c[5]) for c in cases]
+    fig = go.Figure()
+    sites = sorted(d.stop_key.str[0].unique())
+    stn = LOC_STATIONS[LOC_STATIONS.site.isin(sites)]
+    if show_links:
+        for r in d.itertuples():
+            st = LOC_STATIONS[LOC_STATIONS.site == r.stop_key[0]].iloc[0]
+            fig.add_trace(go.Scattermap(lat=[st.station_lat, r.lat], lon=[st.station_lon, r.lon], mode="lines",
+                                        line=dict(width=1, color="rgba(255,255,255,.35)"), hoverinfo="skip", showlegend=False))
+    hover = ("<b>%{customdata[0]}</b> · Site %{customdata[1]}<br>%{customdata[2]:.0f} m from Station · Δh %{customdata[3]:+.0f} m"
+             "<br>%{customdata[4]} · delivered %{customdata[5]:.0f}%<br>cheapest: %{customdata[6]}<extra></extra>")
+    best = [f"SF{int(a)} · {int(b)} dBm" if pd.notna(a) else "none" for a, b in zip(d.best_sf, d.best_pwr)]
+    cd = np.stack([d.stop_key, d.stop_key.str[0], d.distance_to_station_m, d.elev_diff_m, d.land_cover, 100 * d.delivery_rate, best], -1)
+    if colour == "Case":
+        for c in sorted(d.case.unique()):
+            m = d.case == c
+            fig.add_trace(go.Scattermap(lat=d.lat[m], lon=d.lon[m], mode="markers", name=CASE_NAME[c], customdata=cd[m.values],
+                                        marker=dict(size=14, color=CASE_COL[c]), hovertemplate=hover))
+    else:
+        v = 100 * d.delivery_rate if colour == "Delivery %" else d.saving_pct.fillna(0)
+        fig.add_trace(go.Scattermap(lat=d.lat, lon=d.lon, mode="markers", name="stops", customdata=cd, hovertemplate=hover,
+                                    marker=dict(size=15, color=v, colorscale="Viridis" if colour == "Delivery %" else "Plasma",
+                                                cmin=0, cmax=100, colorbar=dict(title=colour, x=1.0))))
+    if show_lost:
+        l = LOC_LOST[LOC_LOST.case.isin(cs)]
+        fig.add_trace(go.Scattermap(lat=l.lat, lon=l.lon, mode="markers", name="lost location (no link)",
+                                    marker=dict(size=11, color="#E4572E", opacity=.9),
+                                    hovertemplate="lost location · Site %{text}<extra></extra>", text=l.site))
+    fig.add_trace(go.Scattermap(lat=stn.station_lat, lon=stn.station_lon, mode="markers+text", name="Station",
+                                marker=dict(size=22, color="gold"), text=["Station " + x for x in stn.site],
+                                textposition="top right", textfont=dict(color="#ffffff", size=13),
+                                hovertemplate="%{text}<extra></extra>"))
+    if stop in set(d.stop_key):
+        r = d[d.stop_key == stop].iloc[0]
+        fig.add_trace(go.Scattermap(lat=[r.lat], lon=[r.lon], mode="markers", name=f"selected {stop}",
+                                    marker=dict(size=28, color="rgba(255,255,255,.0)"), hoverinfo="skip"))
+        fig.add_trace(go.Scattermap(lat=[r.lat], lon=[r.lon], mode="markers", showlegend=False,
+                                    marker=dict(size=26, color="#ffffff", opacity=.45), hoverinfo="skip"))
+    la = np.r_[d.lat, stn.station_lat]; lo = np.r_[d.lon, stn.station_lon]
+    span = max(la.max() - la.min(), lo.max() - lo.min(), 0.002)
+    fig.update_layout(map=dict(style="white-bg", center=dict(lat=float(la.mean()), lon=float(lo.mean())),
+                               zoom=float(np.clip(np.log2(360 / span) - 0.9, 10, 18)),
+                               layers=[dict(below="traces", sourcetype="raster", source=[ESRI]),
+                                       dict(below="traces", sourcetype="raster", source=[ESRI_LABELS])]))
+    style(fig, "Measured stops on satellite imagery (Imagery © Esri)", 640)
+    fig.update_layout(margin=dict(t=48, l=8, r=8, b=8), legend=dict(orientation="h", y=-0.02, x=0))
+    near = d.distance_to_station_m.median()
+    html = ("<div class='metrics'>"
+            f"<div class='metric'><div class='ml'>Stops on map</div><div class='mv'>{len(d)}</div></div>"
+            f"<div class='metric'><div class='ml'>Stations</div><div class='mv'>{len(stn)}</div></div>"
+            f"<div class='metric'><div class='ml'>Lost locations</div><div class='mv'>{len(LOC_LOST[LOC_LOST.case.isin(cs)]) if show_lost else '–'}</div></div>"
+            f"<div class='metric'><div class='ml'>Median distance</div><div class='mv'>{near:.0f} m</div></div></div>")
+    return fig, html
+
+
 # ------------------------------------------------------------------ results tables
 REG = pd.DataFrame([["Mean only", 11.1, 11.4], ["Log-distance", 11.3, 13.0], ["+ elevation (OLS)", 11.4, 15.8],
                     ["+ land cover (ridge)", 11.1, 15.7], ["Regression tree", 11.2, 15.3], ["Random forest", 11.3, 15.0]],
@@ -521,7 +590,7 @@ CSS = """
 HERO = """<div id='hero'><h1>📡 LoRa Hill-Terrain Explorer</h1>
 <p>61 field sweeps at 866 MHz in three hill-terrain case studies near Kathmandu: what gets packets through, what predicts it, and where the dead zones are.</p>
 <div class='chips'><span class='chip'>18 radio settings per stop</span><span class='chip'>5,490 packet slots</span>
-<span class='chip'>grouped + leave-one-case-out validation</span><span class='chip'>no coordinates shown</span></div></div>"""
+<span class='chip'>grouped + leave-one-case-out validation</span><span class='chip'>public views show no coordinates</span></div></div>"""
 
 METHOD = """
 #### How the data were collected
@@ -641,6 +710,17 @@ with gr.Blocks(title="LoRa Hill-Terrain Explorer", **({} if GR6 else {"css": CSS
                         with gr.Tab("Top view"):
                             d_2d = gr.Plot()
 
+        if HAS_MAP:
+            with gr.Tab("Field map"):
+                gr.Markdown("<div class='note'>⚠️ <b>Local view only.</b> This tab shows the real GPS positions from <code>LoRa_data/</code>. "
+                            "Use it for your own analysis or a live demo; do not publish screenshots of it, because the paper withholds locations.</div>")
+                with gr.Row():
+                    fm_col = gr.Radio(["Delivery %", "Case", "Energy saving %"], value="Delivery %", label="Colour stops by")
+                    fm_lost = gr.Checkbox(True, label="Show lost locations")
+                    fm_links = gr.Checkbox(False, label="Draw Station → stop links")
+                fm_html = gr.HTML()
+                fm_fig = gr.Plot()
+
         with gr.Tab("Results & method"):
             gr.Plot(results_fig())
             with gr.Row():
@@ -683,6 +763,12 @@ with gr.Blocks(title="LoRa Hill-Terrain Explorer", **({} if GR6 else {"css": CSS
     D_IN = [d_seed, d_rug, d_sx, d_sy, d_ant, d_sf, d_pw, d_lc, d_layer, d_thr]
     for comp in D_IN:
         comp.release(dead_zone, D_IN, [d_3d, d_2d, d_html]) if isinstance(comp, gr.Slider) else comp.change(dead_zone, D_IN, [d_3d, d_2d, d_html])
+
+    if HAS_MAP:
+        FM_IN = F + [fm_col, fm_lost, fm_links, stop_dd]
+        for comp in FM_IN:
+            comp.change(field_map, FM_IN, [fm_fig, fm_html])
+        demo.load(lambda *a: field_map(*a), FM_IN, [fm_fig, fm_html])
 
     def init():
         return (refresh(*[c.value for c in R_IN])
